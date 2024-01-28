@@ -1,0 +1,15 @@
+{
+  "name": "@anio-js-foundation/node-create-worker",
+  "version": "0.1.0",
+  "description": "Create a node worker.",
+  "main": "./src/index.mjs",
+  "author": "Anio Software <info@anio.software>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anio-js-foundation/node-create-worker.git"
+  },
+  "dependencies": {
+    "@anio-js-foundation/master-slave-protocol": "^0.6.1"
+  }
+}
