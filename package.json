@@ -1,6 +1,6 @@
 {
   "name": "@anio-js-foundation/node-create-worker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Create a node worker.",
   "main": "./src/index.mjs",
   "author": "Anio Software <info@anio.software>",
