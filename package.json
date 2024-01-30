@@ -8,8 +8,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anio-js-foundation/node-create-worker.git"
-  },
-  "dependencies": {
-    "@anio-js-foundation/master-slave-protocol": "^0.6.1"
   }
 }
