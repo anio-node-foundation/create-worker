@@ -13,7 +13,7 @@
     "@anio-js-core-foundation/create-promise": "^1.0.1"
   },
   "devDependencies": {
-    "@anio-js-foundation/bundle-package": "^2.0.0"
+    "@anio-js-foundation/bundle-package": "^2.0.1"
   },
   "scripts": {
     "prepare": "./node_modules/.bin/bundle-package ."
