@@ -17,5 +17,8 @@
   },
   "scripts": {
     "prepare": "./node_modules/.bin/bundle-package ."
-  }
+  },
+  "files": [
+    "./dist/package.mjs"
+  ]
 }
