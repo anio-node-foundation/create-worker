@@ -4,12 +4,9 @@
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
 
-import {spawn} from "node:child_process"
-import fs from "node:fs"
-import os from "node:os"
-import path from "node:path"
+function createTemporaryBootstrapFile(dependencies) {
+	const {os, path, fs} = dependencies
 
-function createTemporaryBootstrapFile() {
 	const tmpdir = os.tmpdir()
 	const tmpname = createRandomIdentifier(16)
 	const tmppath = path.join(tmpdir, tmpname + ".mjs")
@@ -19,7 +16,9 @@ function createTemporaryBootstrapFile() {
 	return tmppath
 }
 
-function createNodeWorkerProcess(options) {
+function createNodeWorkerProcess(dependencies, options) {
+	const {spawn} = dependencies
+
 	let node_binary_path = "node", silent = true
 
 	if ("node_binary" in options) {
@@ -32,7 +31,7 @@ function createNodeWorkerProcess(options) {
 
 	const stdio = silent ? ["pipe", "pipe", "pipe", "ipc"] : ["pipe", "inherit", "inherit", "ipc"]
 
-	const bootstrap_path = createTemporaryBootstrapFile()
+	const bootstrap_path = createTemporaryBootstrapFile(dependencies)
 
 	const child = spawn(node_binary_path, [
 		bootstrap_path
@@ -94,12 +93,12 @@ function createWorkerInstance({
 	return instance
 }
 
-export default function nodeCreateWorker(worker_file_path, worker_args, additional = {}) {
+function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_args, additional = {}) {
 	let {promise, resolve, reject} = createPromise()
 
 	const init_token = Math.random().toString(32) + "_" + Math.random().toString(32)
 
-	let child = createNodeWorkerProcess(additional)
+	let child = createNodeWorkerProcess(dependencies, additional)
 	let worker_message_buffer = []
 
 	child.on("error", reject)
@@ -127,4 +126,17 @@ export default function nodeCreateWorker(worker_file_path, worker_args, addition
 	}))
 
 	return promise
+}
+
+export default async function nodeCreateWorker(...args) {
+	const {spawn} = await import("node:child_process")
+	const fs = await import("node:fs")
+	const os  = await import("node:os")
+	const path = await import("node:path")
+
+	const dependencies = {spawn, fs, os, path}
+
+	return await nodeCreateWorkerImplementation(
+		dependencies, ...args
+	)
 }
