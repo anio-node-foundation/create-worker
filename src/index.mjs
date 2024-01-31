@@ -3,20 +3,9 @@
  */
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
+import createTemporaryResource from "@anio-js-core-foundation/create-temporary-resource"
 
-function createTemporaryBootstrapFile(dependencies) {
-	const {os, path, fs} = dependencies
-
-	const tmpdir = os.tmpdir()
-	const tmpname = createRandomIdentifier(16)
-	const tmppath = path.join(tmpdir, tmpname + ".mjs")
-
-	fs.writeFileSync(tmppath, "function createWorkerThis() {\n\tlet new_this = {}\n\n\tlet currentOnMessageHandler = null\n\n\tprocess.on(\"message\", msg => {\n\t\tif (typeof currentOnMessageHandler === \"function\") {\n\t\t\tcurrentOnMessageHandler(msg)\n\t\t}\n\t})\n\n\tObject.defineProperty(new_this, \"sendMessage\", {\n\t\tset() { throw new Error(`Cannot set sendMessage.`) },\n\t\tget() { return (str) => process.send(str) }\n\t})\n\n\tObject.defineProperty(new_this, \"onMessage\", {\n\t\tget() { throw new Error(`Cannot read onMessage.`) },\n\t\tset(v) { currentOnMessageHandler = v }\n\t})\n\n\treturn new_this\n}\n\nlet onMessageHandler = (msg) => {\n\tif (msg.startsWith(\"init\")) {\n\t\tprocess.removeListener(\"message\", onMessageHandler)\n\n\t\tconst payload = JSON.parse(msg.slice(\"init\".length))\n\n\t\timport(payload.worker_file_path)\n\t\t.then(mod => {\n\t\t\tconst init_args = payload.worker_args\n\n\t\t\tlet new_this = createWorkerThis()\n\n\t\t\treturn mod.WorkerMain.apply(new_this, init_args)\n\t\t})\n\t\t.then(() => {\n\t\t\tprocess.send(payload.init_token)\n\t\t})\n\t}\n}\n\nprocess.on(\"message\", onMessageHandler)\n")
-
-	return tmppath
-}
-
-function createNodeWorkerProcess(dependencies, options) {
+async function createNodeWorkerProcess(dependencies, options) {
 	const {spawn} = dependencies
 
 	let node_binary_path = "node", silent = true
@@ -31,10 +20,12 @@ function createNodeWorkerProcess(dependencies, options) {
 
 	const stdio = silent ? ["pipe", "pipe", "pipe", "ipc"] : ["pipe", "inherit", "inherit", "ipc"]
 
-	const bootstrap_path = createTemporaryBootstrapFile(dependencies)
+	const bootstrap = await createTemporaryResource(
+		"function createWorkerThis() {\n\tlet new_this = {}\n\n\tlet currentOnMessageHandler = null\n\n\tprocess.on(\"message\", msg => {\n\t\tif (typeof currentOnMessageHandler === \"function\") {\n\t\t\tcurrentOnMessageHandler(msg)\n\t\t}\n\t})\n\n\tObject.defineProperty(new_this, \"sendMessage\", {\n\t\tset() { throw new Error(`Cannot set sendMessage.`) },\n\t\tget() { return (str) => process.send(str) }\n\t})\n\n\tObject.defineProperty(new_this, \"onMessage\", {\n\t\tget() { throw new Error(`Cannot read onMessage.`) },\n\t\tset(v) { currentOnMessageHandler = v }\n\t})\n\n\treturn new_this\n}\n\nlet onMessageHandler = (msg) => {\n\tif (msg.startsWith(\"init\")) {\n\t\tprocess.removeListener(\"message\", onMessageHandler)\n\n\t\tconst payload = JSON.parse(msg.slice(\"init\".length))\n\n\t\timport(payload.worker_file_path)\n\t\t.then(mod => {\n\t\t\tconst init_args = payload.worker_args\n\n\t\t\tlet new_this = createWorkerThis()\n\n\t\t\treturn mod.WorkerMain.apply(new_this, init_args)\n\t\t})\n\t\t.then(() => {\n\t\t\tprocess.send(payload.init_token)\n\t\t})\n\t}\n}\n\nprocess.on(\"message\", onMessageHandler)\n", "text/javascript"
+	)
 
 	const child = spawn(node_binary_path, [
-		bootstrap_path
+		bootstrap.location
 	], {
 		stdio
 	})
@@ -43,9 +34,7 @@ function createNodeWorkerProcess(dependencies, options) {
 	let onMessageHandler = (msg) => {
 		child.removeListener("message", onMessageHandler)
 
-		try {
-			fs.unlinkSync(bootstrap_path)
-		} catch {}
+		bootstrap.cleanup()
 	}
 
 	child.on("message", onMessageHandler)
@@ -93,12 +82,12 @@ function createWorkerInstance({
 	return instance
 }
 
-function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_args, additional = {}) {
+async function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_args, additional = {}) {
 	let {promise, resolve, reject} = createPromise()
 
 	const init_token = Math.random().toString(32) + "_" + Math.random().toString(32)
 
-	let child = createNodeWorkerProcess(dependencies, additional)
+	let child = await createNodeWorkerProcess(dependencies, additional)
 	let worker_message_buffer = []
 
 	child.on("error", reject)
@@ -130,11 +119,8 @@ function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_a
 
 export default async function nodeCreateWorker(...args) {
 	const {spawn} = await import("node:child_process")
-	const fs = await import("node:fs")
-	const os  = await import("node:os")
-	const path = await import("node:path")
 
-	const dependencies = {spawn, fs, os, path}
+	const dependencies = {spawn}
 
 	return await nodeCreateWorkerImplementation(
 		dependencies, ...args

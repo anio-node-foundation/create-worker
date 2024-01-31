@@ -1,19 +1,8 @@
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
+import createTemporaryResource from "@anio-js-core-foundation/create-temporary-resource"
 
-function createTemporaryBootstrapFile(dependencies) {
-	const {os, path, fs} = dependencies
-
-	const tmpdir = os.tmpdir()
-	const tmpname = createRandomIdentifier(16)
-	const tmppath = path.join(tmpdir, tmpname + ".mjs")
-
-	fs.writeFileSync(tmppath, `$bootstrap.mjs_file_contents$`)
-
-	return tmppath
-}
-
-function createNodeWorkerProcess(dependencies, options) {
+async function createNodeWorkerProcess(dependencies, options) {
 	const {spawn} = dependencies
 
 	let node_binary_path = "node", silent = true
@@ -28,10 +17,12 @@ function createNodeWorkerProcess(dependencies, options) {
 
 	const stdio = silent ? ["pipe", "pipe", "pipe", "ipc"] : ["pipe", "inherit", "inherit", "ipc"]
 
-	const bootstrap_path = createTemporaryBootstrapFile(dependencies)
+	const bootstrap = await createTemporaryResource(
+		`$bootstrap.mjs_file_contents$`, "text/javascript"
+	)
 
 	const child = spawn(node_binary_path, [
-		bootstrap_path
+		bootstrap.location
 	], {
 		stdio
 	})
@@ -40,9 +31,7 @@ function createNodeWorkerProcess(dependencies, options) {
 	let onMessageHandler = (msg) => {
 		child.removeListener("message", onMessageHandler)
 
-		try {
-			fs.unlinkSync(bootstrap_path)
-		} catch {}
+		bootstrap.cleanup()
 	}
 
 	child.on("message", onMessageHandler)
@@ -90,12 +79,12 @@ function createWorkerInstance({
 	return instance
 }
 
-function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_args, additional = {}) {
+async function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_args, additional = {}) {
 	let {promise, resolve, reject} = createPromise()
 
 	const init_token = Math.random().toString(32) + "_" + Math.random().toString(32)
 
-	let child = createNodeWorkerProcess(dependencies, additional)
+	let child = await createNodeWorkerProcess(dependencies, additional)
 	let worker_message_buffer = []
 
 	child.on("error", reject)
@@ -127,11 +116,8 @@ function nodeCreateWorkerImplementation(dependencies, worker_file_path, worker_a
 
 export default async function nodeCreateWorker(...args) {
 	const {spawn} = await import("node:child_process")
-	const fs = await import("node:fs")
-	const os  = await import("node:os")
-	const path = await import("node:path")
 
-	const dependencies = {spawn, fs, os, path}
+	const dependencies = {spawn}
 
 	return await nodeCreateWorkerImplementation(
 		dependencies, ...args
