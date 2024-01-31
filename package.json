@@ -16,9 +16,10 @@
     "@anio-js-foundation/bundle-package": "^2.0.1"
   },
   "scripts": {
-    "prepare": "./node_modules/.bin/bundle-package ."
+    "prepare": "cp src/bootstrap.mjs dist/ && ./node_modules/.bin/bundle-package ."
   },
   "files": [
-    "./dist/package.mjs"
+    "./dist/package.mjs",
+    "./dist/bootstrap.mjs"
   ]
 }
