@@ -1,3 +1,4 @@
+import createPromise from "@anio-js-core-foundation/create-promise"
 import createNodeWorkerProcess from "./createNodeWorkerProcess.mjs"
 
 function createWorkerInstance({
@@ -41,15 +42,7 @@ function createWorkerInstance({
 }
 
 export default function nodeCreateWorker(worker_file_path, worker_args, additional = {}) {
-	let resolve, reject;
-
-	/**
-	 * @anio-js-core-foundation/create-promise is not
-	 * used here to keep this package dependency free.
-	 */
-	let promise = new Promise((a, b) => {
-		resolve = a; reject = b;
-	})
+	let {promise, resolve, reject} = createPromise()
 
 	const init_token = Math.random().toString(32) + "_" + Math.random().toString(32)
 

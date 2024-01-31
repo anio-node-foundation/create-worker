@@ -8,5 +8,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anio-js-foundation/node-create-worker.git"
+  },
+  "dependencies": {
+    "@anio-js-core-foundation/create-promise": "^1.0.1"
   }
 }
