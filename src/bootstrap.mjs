@@ -22,26 +22,24 @@ function createWorkerThis() {
 	return new_this
 }
 
-export default function() {
-	let onMessageHandler = (msg) => {
-		if (msg.startsWith("init")) {
-			process.removeListener("message", onMessageHandler)
+let onMessageHandler = (msg) => {
+	if (msg.startsWith("init")) {
+		process.removeListener("message", onMessageHandler)
 
-			const payload = JSON.parse(msg.slice("init".length))
+		const payload = JSON.parse(msg.slice("init".length))
 
-			import(payload.worker_file_path)
-			.then(mod => {
-				const init_args = payload.worker_args
+		import(payload.worker_file_path)
+		.then(mod => {
+			const init_args = payload.worker_args
 
-				let new_this = createWorkerThis()
+			let new_this = createWorkerThis()
 
-				return mod.WorkerMain.apply(new_this, init_args)
-			})
-			.then(() => {
-				process.send(payload.init_token)
-			})
-		}
+			return mod.WorkerMain.apply(new_this, init_args)
+		})
+		.then(() => {
+			process.send(payload.init_token)
+		})
 	}
-
-	process.on("message", onMessageHandler)
 }
+
+process.on("message", onMessageHandler)
