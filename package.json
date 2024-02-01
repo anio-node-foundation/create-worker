@@ -12,7 +12,7 @@
   "dependencies": {
     "@anio-js-core-foundation/create-promise": "^1.0.1",
     "@anio-js-core-foundation/create-random-identifier": "^1.0.1",
-    "@anio-js-core-foundation/create-temporary-resource": "^0.0.1"
+    "@anio-js-foundation/create-temporary-resource": "^0.1.0"
   },
   "devDependencies": {
     "@anio-js-foundation/bundle-package": "^2.0.1"
