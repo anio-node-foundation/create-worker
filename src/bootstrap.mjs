@@ -1,3 +1,25 @@
+import nodeIsProcessRunning from "@anio-js-core-foundation/node-is-process-running"
+
+let global_parent_pid = null
+
+function exitIfParentIsDead() {
+	if (global_parent_pid === null) return
+
+	if (!nodeIsProcessRunning(global_parent_pid)) {
+		process.exit(1)
+
+		return true
+	}
+
+	return false
+}
+
+function exitIfParentIsDeadLoop() {
+	if (exitIfParentIsDead()) return
+
+	setTimeout(exitIfParentIsDeadLoop, 250)
+}
+
 function createWorkerThis() {
 	let new_this = {}
 
@@ -11,7 +33,13 @@ function createWorkerThis() {
 
 	Object.defineProperty(new_this, "sendMessage", {
 		set() { throw new Error(`Cannot set sendMessage.`) },
-		get() { return (str) => process.send(str) }
+		get() {
+			return (str) => {
+				exitIfParentIsDead()
+
+				return process.send(str)
+			}
+		}
 	})
 
 	Object.defineProperty(new_this, "onMessage", {
@@ -28,6 +56,8 @@ let onMessageHandler = (msg) => {
 
 		const payload = JSON.parse(msg.slice("init".length))
 
+		global_parent_pid = payload.parent_pid
+
 		import(payload.worker_file_path)
 		.then(mod => {
 			const init_args = payload.worker_args
@@ -38,6 +68,8 @@ let onMessageHandler = (msg) => {
 		})
 		.then(() => {
 			process.send(payload.init_token)
+
+			setTimeout(exitIfParentIsDeadLoop, 0)
 		})
 	}
 }

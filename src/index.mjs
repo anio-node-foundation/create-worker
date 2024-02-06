@@ -106,6 +106,7 @@ async function nodeCreateWorkerImplementation(dependencies, worker_file_path, wo
 	})
 
 	child.send("init" + JSON.stringify({
+		parent_pid: process.pid,
 		worker_file_path,
 		worker_args,
 		init_token,
