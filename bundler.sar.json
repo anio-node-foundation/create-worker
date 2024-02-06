@@ -1,0 +1,5 @@
+[{
+	"source": "./dist/package.mjs",
+	"search": "`$bootstrap.mjs_file_contents$`",
+	"replace": "./src/bootstrap.mjs"
+}]
