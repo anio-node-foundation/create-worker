@@ -1,6 +1,7 @@
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
 import createTemporaryResource from "@anio-js-foundation/create-temporary-resource"
+import bootstrap_code from "includeStaticResource:./bootstrap.mjs"
 
 async function createNodeWorkerProcess(dependencies, options) {
 	const {spawn} = dependencies
@@ -18,7 +19,7 @@ async function createNodeWorkerProcess(dependencies, options) {
 	const stdio = silent ? ["pipe", "pipe", "pipe", "ipc"] : ["pipe", "inherit", "inherit", "ipc"]
 
 	const bootstrap = await createTemporaryResource(
-		`$bootstrap.mjs_file_contents$`, {type: "text/javascript"}
+		bootstrap_code, {type: "text/javascript"}
 	)
 
 	const child = spawn(node_binary_path, [
