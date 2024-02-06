@@ -16,7 +16,7 @@
     "@anio-js-foundation/create-temporary-resource": "^0.3.1"
   },
   "scripts": {
-    "prepare": "./node_modules/.bin/bundle-package ."
+    "prepare": "./node_modules/.bin/bundle-package . bootstrap.mjs && rm dist/bootstrap.mjs"
   },
   "files": [
     "./dist/package.mjs"

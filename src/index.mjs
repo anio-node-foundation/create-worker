@@ -1,7 +1,7 @@
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
 import createTemporaryResource from "@anio-js-foundation/create-temporary-resource"
-import bootstrap_code from "includeStaticResource:./bootstrap.mjs"
+import bootstrap_code from "includeStaticResource:../dist/bootstrap.mjs"
 
 async function createNodeWorkerProcess(dependencies, options) {
 	const {spawn} = dependencies
