@@ -10,9 +10,9 @@ const worker = await nodeCreateWorker(path.join(__dirname, "worker.mjs"), ["a", 
 
 worker.sendMessage("Hello from main!")
 
-worker.onMessage = (msg) => {
+worker.on("message", (msg) => {
 	console.log("Got message from worker", msg)
-}
+})
 
 setTimeout(() => {
 	worker.sendMessage("Hello from main again!")

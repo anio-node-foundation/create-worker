@@ -1,6 +1,8 @@
 import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 import createPromise from "@anio-js-core-foundation/create-promise"
 import createTemporaryResource from "@anio-js-foundation/create-temporary-resource"
+import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
+
 import bootstrap_code from "includeStaticResource:../dist/bootstrap.mjs"
 
 async function createNodeWorkerProcess(dependencies, options) {
@@ -45,25 +47,23 @@ function createWorkerInstance({
 	worker_message_buffer
 }) {
 	let instance = {}
+	let event_emitter = eventEmitter(["message"])
 
-	let currentOnMessageHandler = null
+	let dispatchEvent = event_emitter.install(instance)
 
 	child.on("message", msg => {
-		if (typeof currentOnMessageHandler === "function") {
-			currentOnMessageHandler(msg)
-		}
+		dispatchEvent("message", msg)
 	})
 
-	Object.defineProperty(instance, "onMessage", {
-		set(handler) {
-			// dump message buffer first
-			while (worker_message_buffer.length) {
-				const msg = worker_message_buffer.shift()
+	/* dump message buffer on first 'message' handler installed */
+	event_emitter.setOnEventHandlerAddedHandler((event_name, handler) => {
+		if (event_name !== "message") return
 
-				handler(msg)
-			}
+		// dump buffer
+		while (worker_message_buffer.length) {
+			const msg = worker_message_buffer.shift()
 
-			currentOnMessageHandler = handler
+			handler(msg)
 		}
 	})
 

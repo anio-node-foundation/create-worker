@@ -1,4 +1,5 @@
 import nodeIsProcessRunning from "@anio-js-core-foundation/node-is-process-running"
+import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
 
 let global_parent_pid = null
 
@@ -23,12 +24,12 @@ function exitIfParentIsDeadLoop() {
 function createWorkerThis() {
 	let new_this = {}
 
-	let currentOnMessageHandler = null
+	let event_emitter = eventEmitter(["message"])
+
+	let dispatchEvent = event_emitter.install(new_this)
 
 	process.on("message", msg => {
-		if (typeof currentOnMessageHandler === "function") {
-			currentOnMessageHandler(msg)
-		}
+		dispatchEvent("message", msg)
 	})
 
 	Object.defineProperty(new_this, "sendMessage", {
@@ -42,13 +43,6 @@ function createWorkerThis() {
 				return process.send(str)
 			}
 		}
-	})
-
-	Object.defineProperty(new_this, "onMessage", {
-		enumerable: true,
-
-		get() { throw new Error(`Cannot read onMessage.`) },
-		set(v) { currentOnMessageHandler = v }
 	})
 
 	return new_this
