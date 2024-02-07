@@ -64,7 +64,7 @@ let onMessageHandler = (msg) => {
 
 			let new_this = createWorkerThis()
 
-			return mod.WorkerMain.apply(new_this, init_args)
+			return mod.NodeWorkerMain.apply(new_this, init_args)
 		})
 		.then(() => {
 			process.send(payload.init_token)

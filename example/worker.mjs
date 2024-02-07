@@ -1,5 +1,5 @@
-export function WorkerMain(...args) {
-	console.log("WorkerMain", args)
+export function NodeWorkerMain(...args) {
+	console.log("NodeWorkerMain", args)
 
 	this.onMessage = data => {
 		console.log("Worker got a message", data)
