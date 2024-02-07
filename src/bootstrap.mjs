@@ -32,6 +32,8 @@ function createWorkerThis() {
 	})
 
 	Object.defineProperty(new_this, "sendMessage", {
+		enumerable: true,
+
 		set() { throw new Error(`Cannot set sendMessage.`) },
 		get() {
 			return (str) => {
@@ -43,6 +45,8 @@ function createWorkerThis() {
 	})
 
 	Object.defineProperty(new_this, "onMessage", {
+		enumerable: true,
+
 		get() { throw new Error(`Cannot read onMessage.`) },
 		set(v) { currentOnMessageHandler = v }
 	})
