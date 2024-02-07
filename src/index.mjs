@@ -117,7 +117,8 @@ async function nodeCreateWorkerImplementation(dependencies, worker_file_path, wo
 }
 
 export default async function nodeCreateWorker(...args) {
-	const {spawn} = await import("node:child_process")
+	const {default: child_process} = await import("node:child_process")
+	const {spawn} = child_process
 
 	const dependencies = {spawn}
 
