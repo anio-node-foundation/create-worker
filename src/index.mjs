@@ -2,6 +2,7 @@ import createRandomIdentifier from "@anio-js-core-foundation/create-random-ident
 import createPromise from "@anio-js-core-foundation/create-promise"
 import createTemporaryResource from "@anio-js-foundation/create-temporary-resource"
 import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
+import anioGlobalStore from "@anio-js-core-foundation/anio-global-store"
 
 import bootstrap_code from "includeStaticResource:../dist/bootstrap.mjs"
 
@@ -105,12 +106,18 @@ async function nodeCreateWorkerImplementation(dependencies, worker_file_path, wo
 		}
 	})
 
+	const anio_global_store_shared_items = anioGlobalStore.getSharedItems()
+
 	child.send("init" + JSON.stringify({
 		parent_pid: process.pid,
 		worker_file_path,
 		worker_args,
 		init_token,
-		additional
+		additional,
+		//
+		// pass down shared items from "anio-global-store"
+		//
+		anio_global_store_shared_items: Object.fromEntries(anio_global_store_shared_items)
 	}))
 
 	return promise

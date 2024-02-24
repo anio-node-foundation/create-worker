@@ -1,5 +1,6 @@
 import nodeIsProcessRunning from "@anio-js-core-foundation/node-is-process-running"
 import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
+import {setSharedItem} from "@anio-js-core-foundation/anio-global-store"
 
 let global_parent_pid = null
 
@@ -59,6 +60,15 @@ let onMessageHandler = (msg) => {
 		import(payload.worker_file_path)
 		.then(mod => {
 			const init_args = payload.worker_args
+
+			//
+			// restore shared items from anio-global-store
+			//
+			const {anio_global_store_shared_items} = payload
+
+			for (const key in anio_global_store_shared_items) {
+				setSharedItem(key, anio_global_store_shared_items[key])
+			}
 
 			let new_this = createWorkerThis()
 
