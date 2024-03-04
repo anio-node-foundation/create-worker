@@ -1,6 +1,6 @@
 {
   "name": "@anio-node-foundation/create-worker",
-  "version": "0.10.1",
+  "version": "1.0.0",
   "description": "Create a node worker.",
   "main": "./dist/package.mjs",
   "author": "Anio Software <info@anio.software>",
