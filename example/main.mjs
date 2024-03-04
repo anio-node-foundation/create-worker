@@ -1,7 +1,7 @@
 import nodeCreateWorker from "../dist/package.mjs"
 import path from "node:path"
 import {fileURLToPath} from "node:url"
-import {setSharedItem} from "@anio-js-core-foundation/anio-global-store"
+import {setSharedItem} from "@anio-js-foundation/anio-global-store"
 
 setSharedItem("test", 1337)
 

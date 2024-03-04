@@ -1,3 +1,3 @@
-# @anio-js-foundation/node-create-worker
+# @anio-node-foundation/create-worker
 
 Create a node worker.

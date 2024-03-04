@@ -1,8 +1,8 @@
-import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
-import createPromise from "@anio-js-core-foundation/create-promise"
+import createRandomIdentifier from "@anio-js-foundation/create-random-identifier"
+import createPromise from "@anio-js-foundation/create-promise"
 import createTemporaryResource from "@anio-js-foundation/create-temporary-resource"
-import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
-import anioGlobalStore from "@anio-js-core-foundation/anio-global-store"
+import eventEmitter from "@anio-js-foundation/simple-event-emitter"
+import anioGlobalStore from "@anio-js-foundation/anio-global-store"
 
 import bootstrap_code from "includeStaticResource:../dist/bootstrap.mjs"
 

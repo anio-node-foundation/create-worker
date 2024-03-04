@@ -1,6 +1,6 @@
-import nodeIsProcessRunning from "@anio-js-core-foundation/node-is-process-running"
-import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
-import {setSharedItem} from "@anio-js-core-foundation/anio-global-store"
+import nodeIsProcessRunning from "@anio-node-foundation/process-is-running"
+import eventEmitter from "@anio-js-foundation/simple-event-emitter"
+import {setSharedItem} from "@anio-js-foundation/anio-global-store"
 
 let global_parent_pid = null
 

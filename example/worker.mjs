@@ -1,4 +1,4 @@
-import {getSharedItem} from "@anio-js-core-foundation/anio-global-store"
+import {getSharedItem} from "@anio-js-foundation/anio-global-store"
 
 export function NodeWorkerMain(...args) {
 	console.log("NodeWorkerMain", args)
