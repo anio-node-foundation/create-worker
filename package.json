@@ -2,7 +2,7 @@
   "name": "@anio-node-foundation/create-worker",
   "version": "1.0.0",
   "description": "Create a node worker.",
-  "main": "./dist/package.mjs",
+  "main": "./build/package.mjs",
   "author": "Anio Software <info@anio.software>",
   "license": "MIT",
   "repository": {
@@ -16,12 +16,13 @@
     "@anio-js-foundation/create-temporary-resource": "^1.0.0",
     "@anio-js-foundation/simple-event-emitter": "^1.0.0",
     "@anio-node-foundation/process-is-running": "^2.0.0",
-    "@anio-software/npm-package-bundler": "^1.0.0"
+    "@vipen/target-js": "^0.7.0",
+    "vipen": "^0.0.4"
   },
   "scripts": {
-    "prepare": "./node_modules/.bin/npm-package-bundler ."
+    "prepare": "./node_modules/.bin/vipen ."
   },
   "files": [
-    "./dist/package.mjs"
+    "./build/package.mjs"
   ]
 }

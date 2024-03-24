@@ -1,4 +1,4 @@
-import nodeCreateWorker from "../dist/package.mjs"
+import nodeCreateWorker from "../src/index.mjs"
 import path from "node:path"
 import {fileURLToPath} from "node:url"
 import {setSharedItem} from "@anio-js-foundation/anio-global-store"

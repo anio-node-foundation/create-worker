@@ -4,7 +4,7 @@ import createTemporaryResource from "@anio-js-foundation/create-temporary-resour
 import eventEmitter from "@anio-js-foundation/simple-event-emitter"
 import anioGlobalStore from "@anio-js-foundation/anio-global-store"
 
-import bootstrap_code from "includeStaticResource:../dist/bootstrap.mjs"
+import {loadResource} from "@vipen/target-js"
 
 async function createNodeWorkerProcess(dependencies, options) {
 	const {spawn} = dependencies
@@ -20,6 +20,8 @@ async function createNodeWorkerProcess(dependencies, options) {
 	}
 
 	const stdio = silent ? ["pipe", "pipe", "pipe", "ipc"] : ["pipe", "inherit", "inherit", "ipc"]
+
+	const bootstrap_code = loadResource("esmodule://bootstrap.mjs")
 
 	const bootstrap = await createTemporaryResource(
 		bootstrap_code, {type: "text/javascript"}
